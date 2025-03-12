@@ -2,16 +2,16 @@
 :- dynamic usuario_em_vigor/1, gostar/2.
 
 % gostar(conta, categorias).
-gostar(maria, celular) :- usuario_em_vigor(maria), !.
-gostar(joao, automacao_residencial) :- usuario_em_vigor(joao), !.
+gostar(maria, celular).
+gostar(joao, automacao_residencial).
 
 % define qual usuario será utilizado para fazer as consultas
 usuario_em_vigor(ninguem).
 
 % menu onde é possivel escolher qual usuario será escolhido
-inicio :- format('\nEntrar com qual conta?\n1 - Maria\n2 - João\n3 - Nova conta'),
+inicio :- format('\nEntrar com qual conta?\n1 - Maria\n2 - João\n'),
     	  read(Usuario),
-    	  retract(usuario_em_vigor(Usuario_antigo)),
+    	  retract(usuario_em_vigor(_)),
     	  asserta(usuario_em_vigor(Usuario)).
 		   
 % Cria uma lista de todos os produtos gostados pelo usuario
@@ -26,11 +26,25 @@ exibir_produtos([(Nome, Marca, Preco, Categ)|Tail]) :- format('~w(~w): R$~w - ~w
     												   exibir_produtos(Tail).
 
 % menu_inicial(usuario_em_vigor).
-menu_inicial(Usuario) :- usuario_em_vigor(Usuario),
-    				     produtos_gostados_por_usuario(Usuario, Produtos),
-    				     exibir_produtos(Produtos).
+menu_inicial :- usuario_em_vigor(Usuario),
+				produtos_gostados_por_usuario(Usuario, Produtos),
+				exibir_produtos(Produtos).
 
 
+% adiciona um gosto do usuario em vigor
+adicionar_gostos :- usuario_em_vigor(Usuario),
+    				gostar(Usuario, Antigo_gosto),
+    			    format("\nNovo gosto: "),
+    			    read(Novo_gosto),
+				    assertz(gostar(Usuario, Novo_gosto)).
+
+% remove um gosto do usuario em vigor
+remover_gostos :- usuario_em_vigor(Usuario),
+    			  format("\nGosto a ser removido: "),
+                  read(Gosto),
+                  retract(gostar(Usuario, Gosto)).
+
+                                       
 
 
 % Produto(nome, marca, preço, categoria).
@@ -80,3 +94,4 @@ produto(sistema_cftv, hikvision, 450, seguranca_residencial).
 
 % LISTA DE COMANDOS DE PESQUISA
 % inicio, menu_inicial(_).
+% inicio, menu_inicial(_), adicionar_gostos, menu_inicial(_), remover_gostos, menu_inicial(_).
